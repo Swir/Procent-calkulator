@@ -6,3 +6,4 @@ release/
 fresh-download/
 *.spec
 *-self-test.json
+*.log

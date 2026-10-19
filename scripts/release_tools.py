@@ -12,6 +12,9 @@ import tempfile
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from app_identity import resolve_icon
+from verify_icon import verify_executable_icon
 CONFIG = json.loads((ROOT / "release-config.json").read_text(encoding="utf-8"))
 VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", VERSION):
@@ -57,15 +60,18 @@ def build():
     results = []
     for app in CONFIG["applications"]:
         command = [sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--onefile", "--windowed",
-                   "--specpath", "build", "--name", app["name"]]
+                   "--specpath", "build", "--name", app["name"],
+                   "--icon", str(resolve_icon()), "--add-data", f"{ROOT / 'assets' / 'icons'}:assets/icons"]
         for package in app.get("collect", []):
             command.extend(["--collect-all", package])
         run(command + [app["entry"]])
         exe = ROOT / "dist" / (app["name"] + ".exe")
+        verify_executable_icon(exe, resolve_icon())
         results.append(smoke(exe, ROOT / "build" / (app["name"] + "-self-test.json")))
         shutil.copy2(exe, output / exe.name)
     info = {"version": VERSION, "source_sha": source_sha(), "python": sys.version,
-            "dependencies": {name: importlib.metadata.version(name) for name in CONFIG.get("dependencies", []) + ["pyinstaller"]}}
+            "dependencies": {name: importlib.metadata.version(name) for name in CONFIG.get("dependencies", []) + ["pyinstaller"]},
+            "icon": {"name": resolve_icon().name, "sha256": sha256(resolve_icon())}}
     (output / "BUILD_INFO.json").write_text(json.dumps(info, indent=2), encoding="utf-8")
     (output / "runtime-verification.json").write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
     with zipfile.ZipFile(output / ZIP_NAME, "w", compression=zipfile.ZIP_DEFLATED) as archive:
@@ -74,7 +80,7 @@ def build():
             archive.write(output / exe_name, exe_name)
         for name in [CONFIG["readme"], "CHANGELOG.md", "VERSION"]:
             archive.write(ROOT / name, "README.md" if name == CONFIG["readme"] else name)
-        for directory in ["assets/readme", "docs/screenshots"]:
+        for directory in ["assets/readme", "assets/icons", "docs/screenshots"]:
             if (ROOT / directory).is_dir():
                 for path in sorted((ROOT / directory).rglob("*")):
                     if path.is_file():
@@ -101,6 +107,8 @@ def verify(directory):
     info = json.loads((directory / "BUILD_INFO.json").read_text(encoding="utf-8"))
     if info["version"] != VERSION or info["source_sha"] != source_sha():
         raise RuntimeError("Package version/source provenance mismatch")
+    if info.get("icon") != {"name": resolve_icon().name, "sha256": sha256(resolve_icon())}:
+        raise RuntimeError("Package icon provenance mismatch")
     scratch = ROOT / "build"
     scratch.mkdir(exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="package-check-", dir=scratch) as temp:
@@ -118,6 +126,7 @@ def verify(directory):
             name = app["name"] + ".exe"
             if sha256(target / name) != checksums[name]:
                 raise RuntimeError("Packaged EXE does not match the release EXE")
+            verify_executable_icon(target / name, resolve_icon())
             smoke(target / name, target / (app["name"] + "-verified.json"))
     print(f"Verified {TAG}: checksums, source provenance and extracted Windows runtime")
 

@@ -5,8 +5,9 @@
   "applications": [
     {
       "name": "Procent-Calculator",
-      "entry": "Calculator.py"
+      "entry": "Calculator.py",
+      "collect": ["swirui"]
     }
   ],
-  "dependencies": []
+  "dependencies": ["swirui", "Pillow"]
 }

@@ -1,6 +1,6 @@
 from decimal import Decimal
 import unittest
-from Calculator import calculate, format_number, parse_number
+from calculation import calculate, format_number, parse_number
 
 
 class CalculatorTests(unittest.TestCase):

@@ -1,1 +1,2 @@
-# Uses the Python standard library; Tkinter must be included with Python.
+swirui==0.1.0b1
+Pillow==13.0.0
