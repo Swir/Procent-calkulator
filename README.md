@@ -10,7 +10,7 @@
 
 <br>
 
-![Windows](https://img.shields.io/badge/Windows-Release%20v1.0.0-02050A?style=for-the-badge&logo=windows11&logoColor=62E5FF)
+![Windows](https://img.shields.io/badge/Windows-Source%20v1.1.0-02050A?style=for-the-badge&logo=windows11&logoColor=62E5FF)
 ![Python](https://img.shields.io/badge/Python-3.x-02050A?style=for-the-badge&logo=python&logoColor=62E5FF)
 ![GUI](https://img.shields.io/badge/GUI-Tkinter-02050A?style=for-the-badge&logo=python&logoColor=62E5FF)
 ![Status](https://img.shields.io/badge/Status-Released%20Utility-02050A?style=for-the-badge&logo=github&logoColor=62E5FF)
@@ -32,7 +32,8 @@ Initial calculator window on Windows.
 | Item | Status |
 |---|---|
 | Current stage | Released lightweight utility |
-| Current public release | [v1.0.0](https://github.com/Swir/Procent-calkulator/releases/tag/v1.0.0) |
+| Source version | 1.1.0 |
+| Windows download | [Latest verified release](https://github.com/Swir/Procent-calkulator/releases/latest) |
 | Runtime | Windows EXE or Python 3 + Tkinter |
 | Product roadmap | Not defined; product completion is intentionally **N/A** |
 | Detailed status | [STATUS.md](STATUS.md) |
@@ -52,15 +53,15 @@ Initial calculator window on Windows.
 | 🔢 Base value | Accepts a numeric starting value |
 | `%` Percentage | Calculates the requested percentage of the base value |
 | ➖ Remaining value | Shows the amount left after subtracting the calculated percentage |
-| 🧯 Input validation | Displays an error dialog when the two input fields cannot be parsed as numbers |
+| 🧯 Input validation | Shows an inline error for empty, malformed, non-finite or oversized input |
 | 🪶 Lightweight source | Uses only Python's standard Tkinter/ttk GUI stack |
-| 📦 Windows release | v1.0.0 includes a standalone EXE, portable ZIP and SHA-256 file |
+| 📦 Windows release | The release workflow verifies the EXE, portable ZIP, checksums and fresh-download runtime before publication |
 
 ## ⚙️ Quick Start
 
 ### Recommended — Windows release
 
-Download **v1.0.0** from [GitHub Releases](https://github.com/Swir/Procent-calkulator/releases/tag/v1.0.0). The release contains `Procent-Calculator.exe`, a Windows x64 ZIP package and a SHA-256 checksum file.
+Download the [latest verified Windows release](https://github.com/Swir/Procent-calkulator/releases/latest). Choose `Procent-Calculator.exe` or the portable Windows x64 ZIP and verify the download against `SHA256SUMS.txt`. Source version 1.1.0 is described in [CHANGELOG.md](CHANGELOG.md).
 
 ### From source
 
@@ -93,7 +94,7 @@ Example: for a base value of `1000` and `20%`, the application reports `200` as 
 | Layer | Technology / role |
 |---|---|
 | GUI | Python `tkinter` + `ttk` |
-| Calculation | Floating-point percentage and subtraction |
+| Calculation | Decimal percentage and subtraction, with no binary floating-point rounding |
 | Windows packaging | PyInstaller in the repository release workflow |
 | Release artifacts | EXE + ZIP + SHA-256 |
 
@@ -103,16 +104,26 @@ There is currently no authoritative product roadmap in this repository. To avoid
 
 ## 📦 Releases
 
-Latest verified public release: **[v1.0.0](https://github.com/Swir/Procent-calkulator/releases/tag/v1.0.0)**.
+Download: **[latest verified public release](https://github.com/Swir/Procent-calkulator/releases/latest)**. Source version: **1.1.0**.
 
-The release workflow builds `Procent-Calculator.exe`, packages a Windows x64 ZIP and writes a SHA-256 checksum. Documentation-only migration does not change the application version or published release.
+The release workflow runs regression tests, builds `Procent-Calculator.exe`, checks the extracted portable ZIP and verifies a fresh download of the draft release before publication. It publishes checksums, source/build provenance and runtime verification results. Existing public releases are never overwritten.
 
 ## ⚠️ Current Limitations
 
 - The program implements one calculation flow: percentage amount plus remaining value.
 - The current UI language is Polish only.
-- Numeric calculations use Python floating-point values; this utility is not designed as a financial-precision engine.
+- Inputs accept a comma or point, up to 18 integer digits and 12 fractional digits. Grouping separators and exponent notation are rejected.
+- Negative values and percentages above 100 are supported. This is a general percentage utility, not a tax or accounting rules engine.
 - No repository product roadmap currently defines a measurable completion percentage.
+
+## 🧪 Verification
+
+```powershell
+python -m unittest discover -s tests -v
+python Calculator.py --self-test calculator-self-test.json
+```
+
+The self-test creates a hidden application window, exercises the actual Calculate button, checks decimal input and rejects invalid values. It does not move the pointer or use the clipboard.
 
 ## 🔎 Search Keywords
 

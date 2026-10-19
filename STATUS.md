@@ -6,7 +6,8 @@
 |---|---|
 | Product progress | **N/A** |
 | Reason | No authoritative product roadmap exists in this repository |
-| Latest public release | **v1.0.0** |
+| Current source | **v1.1.0** |
+| Windows package | [Latest verified public release](https://github.com/Swir/Procent-calkulator/releases/latest) |
 | Progress source | No product-roadmap percentage is claimed |
 
-The release is real, but the existence of a release is not treated as a product-completion score.
+The release workflow verifies regression tests, the packaged Windows runtime and a freshly downloaded draft package before publication. The existence of a release is not treated as a product-completion score.

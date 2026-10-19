@@ -1,0 +1,12 @@
+{
+  "title": "Procent Calculator",
+  "package": "Procent-Calculator",
+  "readme": "README.md",
+  "applications": [
+    {
+      "name": "Procent-Calculator",
+      "entry": "Calculator.py"
+    }
+  ],
+  "dependencies": []
+}
